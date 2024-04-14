@@ -9,7 +9,7 @@ void setup() {
 void input() {
 }
 void update() {
-    sprites[0].pos.x += sprites[0].vel.x;
+    sprites[0].pos.x += sprites[0].vel.x*5;
 
     drawPlayer(&animation);
 }

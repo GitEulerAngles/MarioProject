@@ -25,7 +25,7 @@ void drawPlayer(struct playerAnimation * p) {
 
     else {
         p->delay += 1;
-        if (p->delay > 16) {
+        if (p->delay > 8) {
             p->delay = 0;
             if (p->frame == 0)
                 p->frame = 1;

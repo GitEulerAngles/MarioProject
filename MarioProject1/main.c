@@ -19,8 +19,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
 
     MSG msg = { 0 };
     while (true) {
-        DWORD startTime = GetTickCount();
-
         while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT)
                 return msg.wParam;
@@ -29,13 +27,18 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
             DispatchMessage(&msg);
         }
 
+        DWORD startTime = GetTickCount();
+
         input();
         update();
         render();
 
         DWORD frameTime = GetTickCount() - startTime;
 
-        const int FRAME_TIME_MS = 1000 / 30;
+        const DWORD FRAME_TIME_MS = 1000 / 60;
+
+        printf("%d\n", frameTime);
+
         if (frameTime < FRAME_TIME_MS) {
             Sleep(FRAME_TIME_MS - frameTime);
         }

@@ -188,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="math.h" />
+    <ClInclude Include="physics.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>

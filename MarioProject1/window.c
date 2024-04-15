@@ -17,7 +17,7 @@ _Bool createConsole() {
 FIBITMAP* loadPNGImage(char path[]) {
     return FreeImage_Load(FIF_PNG, path, 0);
 }
-void updateImage(HDC* hdc, HDC* memDC, int i) {
+void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
     struct sprite* current_sprite = &sprites[i];
 
     if (current_sprite->resizedBitmap) {
@@ -81,10 +81,11 @@ void updateImage(HDC* hdc, HDC* memDC, int i) {
         blend.SourceConstantAlpha = 255;
         blend.AlphaFormat = AC_SRC_ALPHA;
 
-        AlphaBlend(*memDC, current_sprite->pos.x, current_sprite->pos.y, newWidth / 2, newHeight, hdcSprite, 
-            abs(flipped * (newWidth / 2) - current_sprite->imageCoordinate.x * 10), 0, newWidth / 2, newHeight, blend);
+        AlphaBlend(*memDC, current_sprite->pos.x, current_sprite->pos.y, current_sprite->dim.x, current_sprite->dim.y, hdcSprite,
+            abs(flipped * (newWidth / 2) - current_sprite->imageCoordinate.x * MULTIPLIER), 0, current_sprite->imageDimension.x * MULTIPLIER, newHeight, blend);
 
         SelectObject(hdcSprite, hbmOld);
+        DeleteObject(hdcSprite);
         DeleteObject(hbmDib);
         free(bits);
     }
@@ -111,8 +112,14 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
 
         FillRect(memDC, &clientRect, (HBRUSH)(COLOR_WINDOW));
+        _Bool stored = flipped;
+        flipped = false;
+        for (int i = 0; i < 100; i++) {
+            updateImage(&hdc, &memDC, i, staticSprites);
+        }
+        flipped = stored;
         for (int i = 0; i < 1; i++) {
-            updateImage(&hdc, &memDC, i);
+            updateImage(&hdc, &memDC, i, dynamicSprites);
         }
 
         BitBlt(hdc, 0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, memDC, 0, 0, SRCCOPY);
@@ -127,6 +134,10 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     }
     case WM_TIMER:
     {
+        input();
+        update();
+        render();
+
         InvalidateRect(hWnd, NULL, FALSE);
         break;
     }
@@ -140,18 +151,27 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         break;
     case WM_KEYDOWN:
         if (wp == VK_LEFT) {
-            sprites[0].vel.x = -1;
+            dynamicSprites[0].vel.x = -1;
             flipped = false;
             animation.type = WALKING;
         }
         if (wp == VK_RIGHT) {
-            sprites[0].vel.x = 1;
+            dynamicSprites[0].vel.x = 1;
             flipped = true;
+            animation.type = WALKING;
+        }
+        if (wp == VK_UP) {
+            dynamicSprites[0].vel.y = -1;
+            animation.type = WALKING;
+        }
+        if (wp == VK_DOWN) {
+            dynamicSprites[0].vel.y = 1;
             animation.type = WALKING;
         }
         break;
     case WM_KEYUP:
-        sprites[0].vel.x = 0;
+        dynamicSprites[0].vel.x = 0;
+        dynamicSprites[0].vel.y = 0;
         animation.type = IDLE;
         // Handle key up event
         break;

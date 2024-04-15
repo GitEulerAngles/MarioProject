@@ -2,6 +2,7 @@
 #define SPRITES
 
 #include "math.h"
+#define MULTIPLIER 10
 
 enum animationType {IDLE, WALKING};
 
@@ -21,17 +22,22 @@ struct sprite {
     // Image dimensions
     struct Vector2i originalDim;
     struct Vector2i newDim;
-
+    // On screen data
     struct Vector2i vel;
     struct Vector2i pos;
+    struct Vector2i dim;
 };
 
-struct sprite sprites[1];
+
+
+struct sprite dynamicSprites[1];
+struct sprite staticSprites[100];
 struct playerAnimation animation;
 
 struct playerAnimation createAnimation();
 
-void drawPlayer();
-void createSprite(int index, char path[]);
+void drawPlayer(struct playerAnimation* p);
+void drawBlocks();
+void createSprite(struct sprite* sprites, int index, char path[]);
 
 #endif // SPRITES

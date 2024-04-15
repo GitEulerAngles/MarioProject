@@ -2,24 +2,48 @@
 
 void setup() {
     FreeImage_Initialise(FALSE);
-    sprites[0].imageCoordinate.x = 16;
+    dynamicSprites[0].imageCoordinate.x = 16;
+    dynamicSprites[0].imageCoordinate.y = 16;
+    dynamicSprites[0].imageDimension.x = 16;
+    dynamicSprites[0].imageDimension.y = 20;
+    dynamicSprites[0].dim.x = 16 * MULTIPLIER;
+    dynamicSprites[0].dim.y = 20 * MULTIPLIER;
+    dynamicSprites[0].pos.x = 0;
+    dynamicSprites[0].pos.y = 0;
+
     animation = createAnimation();
-    createSprite(0, "C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
+    createSprite(dynamicSprites, 0, "C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
+    for (int i = 0; i < 100; i++) {
+        struct Vector2i coords = intToVector(i);
+
+        createSprite(staticSprites, i, "C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
+        staticSprites[i].imageDimension.x = 16;
+        staticSprites[i].imageDimension.y = 16;
+        staticSprites[i].imageCoordinate.x = 0;
+        staticSprites[i].imageCoordinate.y = 0;
+        staticSprites[i].pos.x = coords.x * 10 * MULTIPLIER;
+        staticSprites[i].pos.y = coords.y * 10 * MULTIPLIER;
+        staticSprites[i].dim.x = 10 * MULTIPLIER;
+        staticSprites[i].dim.y = 10 * MULTIPLIER;
+    }
 }
 void input() {
+
 }
 void update() {
-    sprites[0].pos.x += sprites[0].vel.x*5;
+    dynamicSprites[0].pos.x += dynamicSprites[0].vel.x * 5;
+    dynamicSprites[0].pos.y += dynamicSprites[0].vel.y * 5;
 
     drawPlayer(&animation);
+    drawBlocks();
 }
 void render() {
     
 }
 void clean() {
     for (int i = 0; i < 1; i++) {
-        FreeImage_Unload(sprites[i].bitmap);
-        FreeImage_Unload(sprites[i].resizedBitmap);
+        FreeImage_Unload(dynamicSprites[i].bitmap);
+        FreeImage_Unload(dynamicSprites[i].resizedBitmap);
     }
     FreeImage_DeInitialise();
     PostQuitMessage(0);

@@ -29,23 +29,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
 
         DWORD startTime = GetTickCount();
 
-        input();
-        update();
-        render();
-
         DWORD frameTime = GetTickCount() - startTime;
 
         const DWORD FRAME_TIME_MS = 1000 / 60;
-
-        printf("%d\n", frameTime);
 
         if (frameTime < FRAME_TIME_MS) {
             Sleep(FRAME_TIME_MS - frameTime);
         }
 
     }
-
-    //clean();
 
     return 0;
 }

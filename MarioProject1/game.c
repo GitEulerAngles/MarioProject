@@ -1,4 +1,5 @@
 #include "game.h"
+#include "physics.h"
 
 void setup() {
     FreeImage_Initialise(FALSE);
@@ -6,8 +7,8 @@ void setup() {
     dynamicSprites[0].imageCoordinate.y = 16;
     dynamicSprites[0].imageDimension.x = 16;
     dynamicSprites[0].imageDimension.y = 20;
-    dynamicSprites[0].dim.x = 16 * MULTIPLIER;
-    dynamicSprites[0].dim.y = 20 * MULTIPLIER;
+    dynamicSprites[0].dim.x = 10 * MULTIPLIER;
+    dynamicSprites[0].dim.y = 12.5 * MULTIPLIER;
     dynamicSprites[0].pos.x = 0;
     dynamicSprites[0].pos.y = 0;
 
@@ -31,14 +32,18 @@ void input() {
 
 }
 void update() {
-    dynamicSprites[0].pos.x += dynamicSprites[0].vel.x * 5;
-    dynamicSprites[0].pos.y += dynamicSprites[0].vel.y * 5;
+    dynamicSprites[0].pos.x += vel.x * 5;
+    dynamicSprites[0].pos.y += vel.y * 5;
+
+    boxes[0] = createBounds(dynamicSprites[0].pos, dynamicSprites[0].dim);
+
+
 
     drawPlayer(&animation);
     drawBlocks();
 }
 void render() {
-    
+
 }
 void clean() {
     for (int i = 0; i < 1; i++) {

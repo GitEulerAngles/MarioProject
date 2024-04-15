@@ -182,6 +182,7 @@
     <ClCompile Include="game.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="math.c" />
+    <ClCompile Include="physics.c" />
     <ClCompile Include="sprites.c" />
     <ClCompile Include="window.c" />
   </ItemGroup>

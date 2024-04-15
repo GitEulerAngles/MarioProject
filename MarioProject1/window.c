@@ -151,28 +151,39 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         break;
     case WM_KEYDOWN:
         if (wp == VK_LEFT) {
-            dynamicSprites[0].vel.x = -1;
+            vel.x = -1;
             flipped = false;
             animation.type = WALKING;
         }
         if (wp == VK_RIGHT) {
-            dynamicSprites[0].vel.x = 1;
+            vel.x = 1;
             flipped = true;
             animation.type = WALKING;
         }
         if (wp == VK_UP) {
-            dynamicSprites[0].vel.y = -1;
+            vel.y = -1;
             animation.type = WALKING;
         }
         if (wp == VK_DOWN) {
-            dynamicSprites[0].vel.y = 1;
+            vel.y = 1;
             animation.type = WALKING;
         }
         break;
     case WM_KEYUP:
-        dynamicSprites[0].vel.x = 0;
-        dynamicSprites[0].vel.y = 0;
-        animation.type = IDLE;
+        if (wp == VK_LEFT) {
+            vel.x = 0;
+        }
+        if (wp == VK_RIGHT) {
+            vel.x = 0;
+        }
+        if (wp == VK_UP) {
+            vel.y = 0;
+        }
+        if (wp == VK_DOWN) {
+            vel.y = 0;
+        }
+        if (vel.x + vel.y == 0)
+            animation.type = IDLE;
         // Handle key up event
         break;
 

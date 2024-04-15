@@ -30,6 +30,9 @@
     <ClCompile Include="math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="physics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="window.h">

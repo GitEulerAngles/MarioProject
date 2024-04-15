@@ -6,6 +6,8 @@
 
 enum animationType {IDLE, WALKING};
 
+struct Vector2i vel;
+
 struct playerAnimation {
     enum animationType type;
     int frame;
@@ -23,12 +25,9 @@ struct sprite {
     struct Vector2i originalDim;
     struct Vector2i newDim;
     // On screen data
-    struct Vector2i vel;
     struct Vector2i pos;
     struct Vector2i dim;
 };
-
-
 
 struct sprite dynamicSprites[1];
 struct sprite staticSprites[100];

@@ -8,6 +8,11 @@ struct Vector2i {
     int y;
 };
 
+struct Vector2f {
+    float x;
+    float y;
+};
+
 int vectorToInt(int x, int y);
 struct Vector2i intToVector(int x);
 struct Vector2i addVectors(struct Vector2i v1, struct Vector2i v2);

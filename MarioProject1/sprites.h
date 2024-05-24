@@ -4,9 +4,9 @@
 #include "math.h"
 #define MULTIPLIER 10
 
-enum animationType {IDLE, WALKING};
+enum animationType {IDLE, WALKING, JUMPING, FALLING};
 
-struct Vector2i vel;
+enum blockType {AIR, QUESTION, GRASS};
 
 struct playerAnimation {
     enum animationType type;
@@ -25,18 +25,22 @@ struct sprite {
     struct Vector2i originalDim;
     struct Vector2i newDim;
     // On screen data
-    struct Vector2i pos;
+    struct Vector2f pos;
     struct Vector2i dim;
 };
 
 struct sprite dynamicSprites[1];
 struct sprite staticSprites[100];
 struct playerAnimation animation;
+struct Vector2f vel;
+_Bool grounded;
+
+enum   blockType blockTypes[100];
 
 struct playerAnimation createAnimation();
 
 void drawPlayer(struct playerAnimation* p);
-void drawBlocks();
+void updateBlocks();
 void createSprite(struct sprite* sprites, int index, char path[]);
 
 #endif // SPRITES

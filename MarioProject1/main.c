@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
         return -1;
 
     hwnd = CreateWindowW(L"Mario", L"Game", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-        0, 0, 1000, 1000, NULL, NULL, NULL, NULL);
+        0, 0, 1016, 1039, NULL, NULL, NULL, NULL);
 
     setup();
 
@@ -26,17 +26,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
-        DWORD startTime = GetTickCount();
-
-        DWORD frameTime = GetTickCount() - startTime;
-
-        const DWORD FRAME_TIME_MS = 1000 / 60;
-
-        if (frameTime < FRAME_TIME_MS) {
-            Sleep(FRAME_TIME_MS - frameTime);
-        }
-
     }
 
     return 0;

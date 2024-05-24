@@ -4,46 +4,72 @@
 void setup() {
     FreeImage_Initialise(FALSE);
     dynamicSprites[0].imageCoordinate.x = 16;
-    dynamicSprites[0].imageCoordinate.y = 16;
+    dynamicSprites[0].imageCoordinate.y = 0;
     dynamicSprites[0].imageDimension.x = 16;
-    dynamicSprites[0].imageDimension.y = 20;
+    dynamicSprites[0].imageDimension.y = 23;
     dynamicSprites[0].dim.x = 10 * MULTIPLIER;
     dynamicSprites[0].dim.y = 12.5 * MULTIPLIER;
     dynamicSprites[0].pos.x = 0;
     dynamicSprites[0].pos.y = 0;
 
     animation = createAnimation();
-    createSprite(dynamicSprites, 0, "C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
-    for (int i = 0; i < 100; i++) {
-        struct Vector2i coords = intToVector(i);
+    FIBITMAP* marioTexture = loadPNGImage("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
+    FIBITMAP* blockTexture = loadPNGImage("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
 
-        createSprite(staticSprites, i, "C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
-        staticSprites[i].imageDimension.x = 16;
-        staticSprites[i].imageDimension.y = 16;
-        staticSprites[i].imageCoordinate.x = 0;
-        staticSprites[i].imageCoordinate.y = 0;
-        staticSprites[i].pos.x = coords.x * 10 * MULTIPLIER;
-        staticSprites[i].pos.y = coords.y * 10 * MULTIPLIER;
-        staticSprites[i].dim.x = 10 * MULTIPLIER;
-        staticSprites[i].dim.y = 10 * MULTIPLIER;
+    createSprite(dynamicSprites, 0, marioTexture);
+    for (int i = 0; i < 100; i++) {
+        createSprite(staticSprites, i, blockTexture);
     }
+
+    createMap();
+    updateBlocks();
+    for (int i = 0; i < 100; i++)
+        staticBoxes[i] = createBounds(staticSprites[i].pos, staticSprites[i].dim);
 }
 void input() {
-
+    dynamicSprites[0].pos.x += vel.x;
+    dynamicSprites[0].pos.y += vel.y;
+    applyGravity(grounded, &vel);
 }
 void update() {
-    dynamicSprites[0].pos.x += vel.x * 5;
-    dynamicSprites[0].pos.y += vel.y * 5;
+    grounded = false;
+    dynamicBoxes[0] = createBounds(dynamicSprites[0].pos, dynamicSprites[0].dim);
 
-    boxes[0] = createBounds(dynamicSprites[0].pos, dynamicSprites[0].dim);
+    for (int i = 0; i < 100; i++)
+    if (blockTypes[i] != AIR) {
+        struct Vector2f collision = resolveCollision(dynamicBoxes[0], staticBoxes[i], false, &grounded);
+            
+        if (collision.y > 0) {
+            grounded = true;
+        }
+        else if (collision.y < 0) {
+            vel.y = 0;
+        }
 
-
-
-    drawPlayer(&animation);
-    drawBlocks();
+        dynamicSprites[0].pos.x -= collision.x;
+        dynamicSprites[0].pos.y -= collision.y;
+        dynamicBoxes[0] = createBounds(dynamicSprites[0].pos, dynamicSprites[0].dim);
+    }
 }
 void render() {
+    static int delay = 0;
 
+    delay++;
+
+    if (delay > 5) {
+        delay = 0;
+        for (int i = 0; i < 100; i++) {
+            if (blockTypes[i] == QUESTION) {
+                staticSprites[i].imageCoordinate.x += 16;
+                if (staticSprites[i].imageCoordinate.x > 32) {
+                    staticSprites[i].imageCoordinate.x = 0;
+                }
+            }
+        }
+    }
+
+    updateBlocks();
+    drawPlayer(&animation);
 }
 void clean() {
     for (int i = 0; i < 1; i++) {

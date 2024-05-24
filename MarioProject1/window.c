@@ -81,8 +81,19 @@ void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
         blend.SourceConstantAlpha = 255;
         blend.AlphaFormat = AC_SRC_ALPHA;
 
-        AlphaBlend(*memDC, current_sprite->pos.x, current_sprite->pos.y, current_sprite->dim.x, current_sprite->dim.y, hdcSprite,
-            abs(flipped * (newWidth / 2) - current_sprite->imageCoordinate.x * MULTIPLIER), 0, current_sprite->imageDimension.x * MULTIPLIER, newHeight, blend);
+        float amountOfFrames = newWidth / 160;
+
+        AlphaBlend(*memDC, 
+            current_sprite->pos.x, 
+            current_sprite->pos.y, 
+            current_sprite->dim.x, 
+            current_sprite->dim.y, 
+            hdcSprite,
+            abs(flipped * newWidth * ((amountOfFrames - 1) / amountOfFrames) - current_sprite->imageCoordinate.x * MULTIPLIER),
+            current_sprite->imageCoordinate.y * MULTIPLIER,
+            current_sprite->imageDimension.x * MULTIPLIER, 
+            current_sprite->imageDimension.y * MULTIPLIER,
+            blend);
 
         SelectObject(hdcSprite, hbmOld);
         DeleteObject(hdcSprite);
@@ -91,6 +102,8 @@ void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
     }
 }
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    float speed = 1;
+
     switch (msg) {
     case WM_PAINT: {
         PAINTSTRUCT ps;
@@ -114,7 +127,7 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         FillRect(memDC, &clientRect, (HBRUSH)(COLOR_WINDOW));
         _Bool stored = flipped;
         flipped = false;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 1; i < 100; i++) {
             updateImage(&hdc, &memDC, i, staticSprites);
         }
         flipped = stored;
@@ -124,8 +137,8 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 
         BitBlt(hdc, 0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, memDC, 0, 0, SRCCOPY);
 
-        SelectObject(memDC, oldBmp); // select back original bitmap
-        DeleteObject(bmp); // delete bitmap since it is no longer required
+        SelectObject(memDC, oldBmp);
+        DeleteObject(bmp);
         DeleteDC(memDC);
 
         EndPaint(hWnd, &ps);
@@ -151,22 +164,19 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         break;
     case WM_KEYDOWN:
         if (wp == VK_LEFT) {
-            vel.x = -1;
+            vel.x = -5;
             flipped = false;
-            animation.type = WALKING;
         }
         if (wp == VK_RIGHT) {
-            vel.x = 1;
+            vel.x = 5;
             flipped = true;
-            animation.type = WALKING;
         }
-        if (wp == VK_UP) {
-            vel.y = -1;
-            animation.type = WALKING;
+        if (wp == VK_UP && grounded) {
+            vel.y = -32;
+            grounded = false;
         }
         if (wp == VK_DOWN) {
-            vel.y = 1;
-            animation.type = WALKING;
+            vel.y = speed;
         }
         break;
     case WM_KEYUP:
@@ -176,19 +186,27 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         if (wp == VK_RIGHT) {
             vel.x = 0;
         }
-        if (wp == VK_UP) {
-            vel.y = 0;
+        if (wp == VK_UP && vel.y < -10) {
+            vel.y += 10;
         }
         if (wp == VK_DOWN) {
-            vel.y = 0;
+            //vel.y = 0;
         }
-        if (vel.x + vel.y == 0)
-            animation.type = IDLE;
         // Handle key up event
         break;
 
     default:
         return DefWindowProcW(hWnd, msg, wp, lp);
     }
+
+    if (vel.y < 0)
+        animation.type = JUMPING;
+    else if (vel.y > 1)
+        animation.type = FALLING;
+    else if (vel.x == 0)
+        animation.type = IDLE;
+    else
+        animation.type = WALKING;
+
     return 0;
 }

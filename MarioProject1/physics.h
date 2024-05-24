@@ -8,10 +8,12 @@ struct aabb {
     struct Vector2i max;
 };
 
-struct aabb boxes[1];
+struct aabb dynamicBoxes[1];
+struct aabb staticBoxes[100];
 
-struct aabb createBounds(struct Vector2i pos, struct Vector2i dim);
+void applyGravity(_Bool grounded, float* vely);
+struct aabb createBounds(struct Vector2f pos, struct Vector2i dim);
 _Bool checkCollision(struct aabb b1, struct aabb b2);
-
+struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, _Bool dynamicCollision);
 
 #endif // !PHYSICS

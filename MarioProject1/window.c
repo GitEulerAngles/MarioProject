@@ -17,21 +17,20 @@ _Bool createConsole() {
 FIBITMAP* loadPNGImage(char path[]) {
     return FreeImage_Load(FIF_PNG, path, 0);
 }
-void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
-    struct sprite* current_sprite = &sprites[i];
 
-    if (current_sprite->resizedBitmap) {
-        int newWidth = current_sprite->newDim.x;
-        int newHeight = current_sprite->newDim.y;
+void updateHDC(HDC* hdc, HDC* hdcSprite, HDC* memDC, FIBITMAP* map, HBITMAP* hbmOld, _Bool isFlipped) {
+    if (map) {
+        int newWidth = FreeImage_GetWidth(map);
+        int newHeight = FreeImage_GetHeight(map);
 
-        FIBITMAP* resizedBitmap = current_sprite->resizedBitmap;
+        FIBITMAP* resizedBitmap = map;
 
         BYTE* bits = (BYTE*)malloc(newWidth * newHeight * 4);
 
         FreeImage_ConvertToRawBits(bits, resizedBitmap, newWidth * 4, 32,
             FI_RGBA_RED_MASK, FI_RGBA_GREEN_MASK, FI_RGBA_BLUE_MASK, TRUE);
 
-        if (flipped) {
+        if (isFlipped) {
             BYTE* flippedBits = (BYTE*)malloc(newWidth * newHeight * 4);
 
             for (int y = 0; y < newHeight; y++) {
@@ -58,8 +57,8 @@ void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
         bmi.bmiHeader.biBitCount = 32;
         bmi.bmiHeader.biCompression = BI_RGB;
 
-        HDC hdcSprite = CreateCompatibleDC(*hdc);
-        if (!hdcSprite) {
+        *hdcSprite = CreateCompatibleDC(*hdc);
+        if (!*hdcSprite) {
             printf("Error: hdcSprite note created.\n");
             free(bits);
             return;
@@ -69,37 +68,36 @@ void updateImage(HDC* hdc, HDC* memDC, int i, struct sprite *sprites) {
         if (!hbmDib) {
             printf("Error: hbmDib not created.\n");
             free(bits);
-            DeleteDC(hdcSprite);
+            DeleteDC(*hdcSprite);
             return;
         }
 
-        HBITMAP hbmOld = (HBITMAP)SelectObject(hdcSprite, hbmDib);
+        *hbmOld = (HBITMAP)SelectObject(*hdcSprite, hbmDib);
 
-        BLENDFUNCTION blend = { 0 };
-        blend.BlendOp = AC_SRC_OVER;
-        blend.BlendFlags = 0;
-        blend.SourceConstantAlpha = 255;
-        blend.AlphaFormat = AC_SRC_ALPHA;
-
-        float amountOfFrames = newWidth / 160;
-
-        AlphaBlend(*memDC, 
-            current_sprite->pos.x, 
-            current_sprite->pos.y, 
-            current_sprite->dim.x, 
-            current_sprite->dim.y, 
-            hdcSprite,
-            abs(flipped * newWidth * ((amountOfFrames - 1) / amountOfFrames) - current_sprite->imageCoordinate.x * MULTIPLIER),
-            current_sprite->imageCoordinate.y * MULTIPLIER,
-            current_sprite->imageDimension.x * MULTIPLIER, 
-            current_sprite->imageDimension.y * MULTIPLIER,
-            blend);
-
-        SelectObject(hdcSprite, hbmOld);
-        DeleteObject(hdcSprite);
         DeleteObject(hbmDib);
         free(bits);
     }
+}
+void updateImage(HDC* hdc, HDC* memDC, int width, _Bool isFlipped, struct sprite* current_sprite) {
+    BLENDFUNCTION blend = { 0 };
+    blend.BlendOp = AC_SRC_OVER;
+    blend.BlendFlags = 0;
+    blend.SourceConstantAlpha = 255;
+    blend.AlphaFormat = AC_SRC_ALPHA;
+
+    float amountOfFrames = width / 160;
+
+    AlphaBlend(*memDC, 
+        current_sprite->pos.x, 
+        current_sprite->pos.y, 
+        current_sprite->dim.x, 
+        current_sprite->dim.y, 
+        *hdc,
+        abs(isFlipped * width * ((amountOfFrames - 1) / amountOfFrames) - current_sprite->imageCoordinate.x * MULTIPLIER),
+        current_sprite->imageCoordinate.y * MULTIPLIER,
+        current_sprite->imageDimension.x * MULTIPLIER, 
+        current_sprite->imageDimension.y * MULTIPLIER,
+        blend);
 }
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     float speed = 1;
@@ -125,15 +123,29 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         HBITMAP oldBmp = (HBITMAP)SelectObject(memDC, bmp);
 
         FillRect(memDC, &clientRect, (HBRUSH)(COLOR_WINDOW));
-        _Bool stored = flipped;
-        flipped = false;
-        for (int i = 1; i < 100; i++) {
-            updateImage(&hdc, &memDC, i, staticSprites);
+
+        HDC sprite;
+        HBITMAP hbmOld;
+        
+        // Block textures
+        updateHDC(&hdc, &sprite, &memDC, blockTexture, &hbmOld, false);
+
+        for (int i = 0; i < 100; i++) {
+            updateImage(&sprite, &memDC, FreeImage_GetWidth(blockTexture), false, &staticSprites[i]);
         }
-        flipped = stored;
+
+        SelectObject(sprite, hbmOld);
+        DeleteObject(sprite);
+
+        // Mario textures
+        updateHDC(&hdc, &sprite, &memDC, marioTexture, &hbmOld, flipped);
+
         for (int i = 0; i < 1; i++) {
-            updateImage(&hdc, &memDC, i, dynamicSprites);
+            updateImage(&sprite, &memDC, FreeImage_GetWidth(marioTexture), flipped, &dynamicSprites[i]);
         }
+
+        SelectObject(sprite, hbmOld);
+        DeleteObject(sprite);
 
         BitBlt(hdc, 0, 0, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, memDC, 0, 0, SRCCOPY);
 

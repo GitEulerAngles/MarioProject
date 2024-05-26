@@ -9,15 +9,15 @@ struct playerAnimation createAnimation() {
     return newP;
 }
 
-void createSprite(struct sprite *sprites, int index, FIBITMAP *map) {
-    struct sprite* current_sprite = &sprites[index];
+FIBITMAP* createSprite(char path[]) {
+    FIBITMAP* map = loadPNGImage(path);
 
-    current_sprite->bitmap = map;
-    current_sprite->originalDim.x = FreeImage_GetWidth(current_sprite->bitmap);
-    current_sprite->originalDim.y = FreeImage_GetHeight(current_sprite->bitmap);
-    current_sprite->newDim.x = (current_sprite->originalDim.x) * MULTIPLIER;
-    current_sprite->newDim.y = (current_sprite->originalDim.y) * MULTIPLIER;
-    current_sprite->resizedBitmap = FreeImage_Rescale(current_sprite->bitmap, current_sprite->newDim.x, current_sprite->newDim.y, FILTER_BOX);
+    int w = FreeImage_GetWidth(map);
+    int h = FreeImage_GetHeight(map);
+
+    FIBITMAP* resizedMap = FreeImage_Rescale(map, w * MULTIPLIER, h * MULTIPLIER, FILTER_BOX);
+    FreeImage_Unload(map);
+    return resizedMap;
 }
 
 void createMap() {

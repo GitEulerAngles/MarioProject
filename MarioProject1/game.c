@@ -13,16 +13,14 @@ void setup() {
     dynamicSprites[0].pos.y = 0;
 
     animation = createAnimation();
-    FIBITMAP* marioTexture = loadPNGImage("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
-    FIBITMAP* blockTexture = loadPNGImage("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
-
-    createSprite(dynamicSprites, 0, marioTexture);
-    for (int i = 0; i < 100; i++) {
-        createSprite(staticSprites, i, blockTexture);
-    }
 
     createMap();
+
     updateBlocks();
+
+    marioTexture = createSprite("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
+    blockTexture = createSprite("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
+
     for (int i = 0; i < 100; i++)
         staticBoxes[i] = createBounds(staticSprites[i].pos, staticSprites[i].dim);
 }
@@ -72,10 +70,7 @@ void render() {
     drawPlayer(&animation);
 }
 void clean() {
-    for (int i = 0; i < 1; i++) {
-        FreeImage_Unload(dynamicSprites[i].bitmap);
-        FreeImage_Unload(dynamicSprites[i].resizedBitmap);
-    }
+    FreeImage_Unload(marioTexture);
     FreeImage_DeInitialise();
     PostQuitMessage(0);
 }

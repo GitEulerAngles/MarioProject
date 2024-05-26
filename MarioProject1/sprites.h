@@ -15,19 +15,16 @@ struct playerAnimation {
 };
 
 struct sprite {
-    // Bitmaps
-    FIBITMAP* bitmap;
-    FIBITMAP* resizedBitmap;
     // Image coordinates
     struct Vector2i imageCoordinate;
     struct Vector2i imageDimension;
-    // Image dimensions
-    struct Vector2i originalDim;
-    struct Vector2i newDim;
     // On screen data
     struct Vector2f pos;
     struct Vector2i dim;
 };
+
+FIBITMAP* marioTexture;
+FIBITMAP* blockTexture;
 
 struct sprite dynamicSprites[1];
 struct sprite staticSprites[100];
@@ -41,6 +38,6 @@ struct playerAnimation createAnimation();
 
 void drawPlayer(struct playerAnimation* p);
 void updateBlocks();
-void createSprite(struct sprite* sprites, int index, char path[]);
+FIBITMAP* createSprite(char path[]);
 
 #endif // SPRITES

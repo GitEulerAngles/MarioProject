@@ -9,7 +9,7 @@ struct aabb {
 };
 
 struct aabb dynamicBoxes[1];
-struct aabb staticBoxes[100];
+struct aabb staticBoxes[121];
 
 void applyGravity(_Bool grounded, float* vely);
 struct aabb createBounds(struct Vector2f pos, struct Vector2i dim);

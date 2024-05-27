@@ -17,7 +17,6 @@ _Bool createConsole() {
 FIBITMAP* loadPNGImage(char path[]) {
     return FreeImage_Load(FIF_PNG, path, 0);
 }
-
 void updateHDC(HDC* hdc, HDC* hdcSprite, HDC* memDC, FIBITMAP* map, HBITMAP* hbmOld, _Bool isFlipped) {
     if (map) {
         int newWidth = FreeImage_GetWidth(map);
@@ -78,7 +77,7 @@ void updateHDC(HDC* hdc, HDC* hdcSprite, HDC* memDC, FIBITMAP* map, HBITMAP* hbm
         free(bits);
     }
 }
-void updateImage(HDC* hdc, HDC* memDC, int width, _Bool isFlipped, struct sprite* current_sprite) {
+void updateImage(HDC* hdc, HDC* memDC, int width, _Bool isFlipped, struct Sprite* current_sprite) {
     BLENDFUNCTION blend = { 0 };
     blend.BlendOp = AC_SRC_OVER;
     blend.BlendFlags = 0;
@@ -88,8 +87,8 @@ void updateImage(HDC* hdc, HDC* memDC, int width, _Bool isFlipped, struct sprite
     float amountOfFrames = width / 160;
 
     AlphaBlend(*memDC, 
-        current_sprite->pos.x, 
-        current_sprite->pos.y, 
+        current_sprite->pos.x - cameraPos.x, 
+        current_sprite->pos.y - cameraPos.y, 
         current_sprite->dim.x, 
         current_sprite->dim.y, 
         *hdc,
@@ -130,7 +129,7 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         // Block textures
         updateHDC(&hdc, &sprite, &memDC, blockTexture, &hbmOld, false);
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 161; i++) {
             updateImage(&sprite, &memDC, FreeImage_GetWidth(blockTexture), false, &staticSprites[i]);
         }
 
@@ -198,7 +197,7 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         if (wp == VK_RIGHT) {
             vel.x = 0;
         }
-        if (wp == VK_UP && vel.y < -10) {
+        if (wp == VK_UP && vel.y < -20) {
             vel.y += 10;
         }
         if (wp == VK_DOWN) {

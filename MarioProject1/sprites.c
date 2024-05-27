@@ -1,12 +1,19 @@
 #include "window.h"
 #include <stdio.h>
 
-struct playerAnimation createAnimation() {
-    struct playerAnimation newP;
-    newP.type = IDLE;
-    newP.frame = 0;
-    newP.delay = 16;
-    return newP;
+const int length = 90;
+
+int spritePosition(int i) {
+    struct Vector2i coords = intToVector(i, 11);
+
+    int blockX = floor(cameraPos.x / 100) + coords.x;
+    int blockY = floor(cameraPos.y / 100) + coords.y;
+
+    if (blockX < 0 || blockY < 0 ||
+        blockX >= length || blockY >= length)
+        return 0;
+
+    return vectorToInt(blockX, blockY, length);
 }
 
 FIBITMAP* createSprite(char path[]) {
@@ -29,17 +36,11 @@ void createMap() {
         return 1;
     }
 
-    int ch, count = 0;
+    int ch;
     while ((ch = fgetc(file)) != EOF) {
         if (ch >= '0' && ch <= '9') {
             char str[2] = { ch, '\0' };
-            blockTypes[count] = atoi(str);
-            count++;
-
-            if (count >= 100) {
-                fprintf(stderr, "Error: Too many block types in file.\n");
-                break;
-            }
+            addElement(&blockTypes, atoi(str));
         }
     }
 
@@ -47,18 +48,29 @@ void createMap() {
 }
 
 void updateBlocks() {
-    for (int i = 0; i < 100; i++) {
-        struct Vector2i coords = intToVector(i);
+    for (int i = 0; i < 121; i++) {
+        struct Vector2i coords = intToVector(i, 11);
 
-        if (blockTypes[i] == QUESTION) {
+        int blockX = floor(cameraPos.x / 100) + coords.x;
+        int blockY = floor(cameraPos.y / 100) + coords.y;
+
+        if (blockX < 0 || blockY < 0 ||
+            blockX >= length || blockY >= length)
+            continue;
+
+        int block = vectorToInt(blockX, blockY, length);
+
+        if (getElement(&blockTypes, block) == QUESTION) {
             staticSprites[i].imageDimension.x = 16;
             staticSprites[i].imageDimension.y = 16;
-            staticSprites[i].pos.x = coords.x * 10 * MULTIPLIER;
-            staticSprites[i].pos.y = coords.y * 10 * MULTIPLIER;
+            //staticSprites[i].imageCoordinate.x = 0;
+            staticSprites[i].imageCoordinate.y = 0;
+            staticSprites[i].pos.x = blockX * 10 * MULTIPLIER;
+            staticSprites[i].pos.y = blockY * 10 * MULTIPLIER;
             staticSprites[i].dim.x = 10 * MULTIPLIER;
             staticSprites[i].dim.y = 10 * MULTIPLIER;
         }
-        else if (blockTypes[i] == GRASS) {
+        else if (getElement(&blockTypes, block) == GRASS) {
             staticSprites[i].imageDimension.x = 16;
             staticSprites[i].imageDimension.y = 16;
 
@@ -67,29 +79,30 @@ void updateBlocks() {
 
             // Get neighboring squares
             for (int i = 0; i < 4; i++) {
-                struct Vector2i new_coord = { coords.x + neighbors[i][0], coords.y + neighbors[i][1] };
+                struct Vector2i new_coord = { blockX + neighbors[i][0], blockY + neighbors[i][1] };
 
                 if (new_coord.x < 0 || new_coord.y < 0 || 
-                    new_coord.x > 9 || new_coord.y > 9)
+                    new_coord.x >= length || new_coord.y >= length)
                     continue;
 
-                if (blockTypes[vectorToInt(new_coord.x, new_coord.y)] == GRASS)
+                if (getElement(&blockTypes, vectorToInt(new_coord.x, new_coord.y, length)) == GRASS)
                     count += pow(2, i);
             }
 
-            staticSprites[i].imageCoordinate.x = (count % 3) * 16;
-            staticSprites[i].imageCoordinate.y = (floor(count / 3) + 1) * 16;
+            struct Vector2i imageCoords = intToVector(count, 3);
 
-            staticSprites[i].pos.x = coords.x * 10 * MULTIPLIER;
-            staticSprites[i].pos.y = coords.y * 10 * MULTIPLIER;
+            staticSprites[i].imageCoordinate.x = imageCoords.x * 16;
+            staticSprites[i].imageCoordinate.y = (imageCoords.y + 1) * 16;
+            staticSprites[i].pos.x = blockX * 10 * MULTIPLIER;
+            staticSprites[i].pos.y = blockY * 10 * MULTIPLIER;
             staticSprites[i].dim.x = 10 * MULTIPLIER;
             staticSprites[i].dim.y = 10 * MULTIPLIER;
         }
         else {
             staticSprites[i].imageDimension.x = 0;
             staticSprites[i].imageDimension.y = 0;
-            staticSprites[i].pos.x = coords.x * 10 * MULTIPLIER;
-            staticSprites[i].pos.y = coords.y * 10 * MULTIPLIER;
+            staticSprites[i].pos.x = blockX * 10 * MULTIPLIER;
+            staticSprites[i].pos.y = blockY * 10 * MULTIPLIER;
             staticSprites[i].dim.x = 10 * MULTIPLIER;
             staticSprites[i].dim.y = 10 * MULTIPLIER;
         }

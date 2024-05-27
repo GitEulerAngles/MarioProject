@@ -2,19 +2,12 @@
 #define SPRITES
 
 #include "math.h"
+#include "player.h"
 #define MULTIPLIER 10
 
-enum animationType {IDLE, WALKING, JUMPING, FALLING};
+enum BlockType {AIR, QUESTION, GRASS};
 
-enum blockType {AIR, QUESTION, GRASS};
-
-struct playerAnimation {
-    enum animationType type;
-    int frame;
-    int delay;
-};
-
-struct sprite {
+struct Sprite {
     // Image coordinates
     struct Vector2i imageCoordinate;
     struct Vector2i imageDimension;
@@ -26,16 +19,12 @@ struct sprite {
 FIBITMAP* marioTexture;
 FIBITMAP* blockTexture;
 
-struct sprite dynamicSprites[1];
-struct sprite staticSprites[100];
-struct playerAnimation animation;
-struct Vector2f vel;
-_Bool grounded;
+struct Sprite dynamicSprites[1];
+struct Sprite staticSprites[121];
 
-enum   blockType blockTypes[100];
+struct Vector blockTypes;
 
-struct playerAnimation createAnimation();
-
+int spritePosition(int i);
 void drawPlayer(struct playerAnimation* p);
 void updateBlocks();
 FIBITMAP* createSprite(char path[]);

@@ -183,6 +183,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="math.c" />
     <ClCompile Include="physics.c" />
+    <ClCompile Include="player.c" />
     <ClCompile Include="sprites.c" />
     <ClCompile Include="window.c" />
   </ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="physics.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="sprites.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>

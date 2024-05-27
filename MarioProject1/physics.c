@@ -1,7 +1,7 @@
 #include "physics.h"
 
-struct aabb createBounds(struct Vector2f pos, struct Vector2i dim) {
-    struct aabb r = { pos.x, pos.y, pos.x + dim.x, pos.y + dim.y };
+struct aabb createBounds(struct Vector2f pos, struct Vector2i dim, struct Vector2f offSet) {
+    struct aabb r = { pos.x + offSet.x, pos.y + offSet.y, pos.x + dim.x - offSet.x, pos.y + dim.y };
     return r;
 }
 

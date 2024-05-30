@@ -1,7 +1,7 @@
 #ifndef PLAYER
 #define PLAYER
 
-#include "math.h"
+#include "physics.h"
 
 
 enum animationType { IDLE, WALKING, JUMPING, FALLING };
@@ -14,7 +14,9 @@ struct playerAnimation {
 
 struct Vector2f cameraPos;
 struct Vector2f vel;
+struct aabb physicsPos;
 
+_Bool running;
 _Bool grounded;
 struct playerAnimation animation;
 

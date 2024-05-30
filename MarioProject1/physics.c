@@ -12,6 +12,24 @@ _Bool checkCollision(struct aabb b1, struct aabb b2) {
     return 1;
 }
 
+struct Vector2i getSide(struct aabb b1, struct aabb b2) {
+    struct Vector2i v = { 0,0 };
+    struct Vector2f center = { (b1.min.x + b1.max.x) / 2, (b1.min.y + b1.max.y) / 2 };
+    if (b1.max.x > b2.min.x && b1.min.x < b2.max.x) {
+        if (b2.max.y < center.y)
+            v.y += 1;
+        else if (b2.min.y > center.y)
+            v.y = -1;
+    }
+    else if (b1.max.y > b2.min.y && b1.min.y < b2.max.y) {
+        if (b2.max.x < center.x)
+            v.x = 1;
+        else if (b2.min.x > center.x)
+            v.x = -1;
+    }
+    return v;
+}
+
 void applyGravity(_Bool grounded, struct Vector2f *vel) {
     if (grounded)
         vel->y = 1;
@@ -54,7 +72,7 @@ struct Vector2f calculateOverlap(struct aabb b1, struct aabb b2, struct Vector2f
     return overlap;
 }
 
-struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, _Bool dynamicCollision, _Bool* grounded) {
+struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, struct aabb precision, _Bool* grounded) {
     struct Vector2f r = { 0,0 };
 
     if (!checkCollision(b1, b2))
@@ -63,15 +81,23 @@ struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, _Bool dynamicCo
     struct Vector2f n = calculateNormal(b1,b2);
     r = calculateOverlap(b1, b2, n);
 
-    if (r.x < r.y) {
-        if (n.x < 0)
-            r.x *= -1;
-        r.y = 0;
+    if (precision.max.x == -999) {
+        if (r.x < r.y) {
+            if (n.x < 0)
+                r.x *= -1;
+            r.y = 0;
+        }
+        else {
+            if (n.y < 0)
+                r.y *= -1;
+            r.x = 0;
+        }
     }
     else {
-        if (n.y < 0)
-            r.y *= -1;
-        r.x = 0;
+        struct Vector2i side = getSide(b2, precision);
+
+        r.x *= side.x;
+        r.y *= side.y;
     }
 
     return r;

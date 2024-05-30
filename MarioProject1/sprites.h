@@ -18,13 +18,16 @@ struct Sprite {
 
 FIBITMAP* marioTexture;
 FIBITMAP* blockTexture;
+FIBITMAP* backgroundTexture;
 
+struct Sprite backgroundSprite[2];
 struct Sprite dynamicSprites[1];
 struct Sprite staticSprites[121];
 
 struct Vector blockTypes;
 
 int spritePosition(int i);
+void updateBackground(struct Vector2f pos);
 void drawPlayer(struct playerAnimation* p);
 void updateBlocks();
 FIBITMAP* createSprite(char path[]);

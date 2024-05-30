@@ -22,6 +22,9 @@ void updateCamera(struct Vector2f pos) {
         cameraPos.x = pos.x - 558;
     }
 
+    if (cameraPos.x < 0)
+        cameraPos.x = 0;
+
     if (pos.y - cameraPos.y < 357) {
         cameraPos.y = pos.y - 357;
     }

@@ -14,6 +14,6 @@ struct aabb staticBoxes[121];
 void applyGravity(_Bool grounded, float* vely);
 struct aabb createBounds(struct Vector2f pos, struct Vector2i dim);
 _Bool checkCollision(struct aabb b1, struct aabb b2);
-struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, _Bool dynamicCollision);
+struct Vector2f resolveCollision(struct aabb b1, struct aabb b2, struct aabb precision, _Bool* grounded);
 
 #endif // !PHYSICS

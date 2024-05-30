@@ -3,6 +3,23 @@
 
 const int length = 90;
 
+void updateBackground(struct Vector2f pos) {
+    for (int i = 0; i < 2; i++) {
+        backgroundSprite[i].imageCoordinate.x = 0;
+        backgroundSprite[i].imageCoordinate.y = 0;
+        backgroundSprite[i].imageDimension.x = 128;
+        backgroundSprite[i].imageDimension.y = 108;
+        backgroundSprite[i].dim.x = 1016;
+        backgroundSprite[i].dim.y = 1039;
+        backgroundSprite[i].pos.y = pos.y;
+
+        float x = fmod(pos.x, 10000) * 0.0001;
+        float bpos = x * 1016;
+
+        backgroundSprite[i].pos.x = pos.x - bpos + 1016 * i;
+    }
+}
+
 int spritePosition(int i) {
     struct Vector2i coords = intToVector(i, 11);
 
@@ -63,7 +80,6 @@ void updateBlocks() {
         if (getElement(&blockTypes, block) == QUESTION) {
             staticSprites[i].imageDimension.x = 16;
             staticSprites[i].imageDimension.y = 16;
-            //staticSprites[i].imageCoordinate.x = 0;
             staticSprites[i].imageCoordinate.y = 0;
             staticSprites[i].pos.x = blockX * 10 * MULTIPLIER;
             staticSprites[i].pos.y = blockY * 10 * MULTIPLIER;
@@ -118,7 +134,7 @@ void drawPlayer(struct playerAnimation * p) {
         dynamicSprites[0].imageCoordinate.x = 48;
     else {
         p->delay += 1;
-        if (p->delay > 8) {
+        if (p->delay > 10 - abs(vel.x / 3)) {
             p->delay = 0;
             if (p->frame == 0)
                 p->frame = 1;

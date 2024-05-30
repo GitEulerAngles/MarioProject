@@ -99,8 +99,6 @@ void updateImage(HDC* hdc, HDC* memDC, int width, _Bool isFlipped, struct Sprite
         blend);
 }
 LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
-    float speed = 1;
-
     switch (msg) {
     case WM_PAINT: {
         PAINTSTRUCT ps;
@@ -126,10 +124,19 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         HDC sprite;
         HBITMAP hbmOld;
         
+        // Background texture
+        updateHDC(&hdc, &sprite, &memDC, backgroundTexture, &hbmOld, false);
+
+        for (int i = 0; i < 2; i++)
+            updateImage(&sprite, &memDC, FreeImage_GetWidth(backgroundTexture), false, &backgroundSprite[i]);
+
+        SelectObject(sprite, hbmOld);
+        DeleteObject(sprite);
+
         // Block textures
         updateHDC(&hdc, &sprite, &memDC, blockTexture, &hbmOld, false);
 
-        for (int i = 0; i < 161; i++) {
+        for (int i = 0; i < 121; i++) {
             updateImage(&sprite, &memDC, FreeImage_GetWidth(blockTexture), false, &staticSprites[i]);
         }
 
@@ -174,12 +181,17 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
         clean();
         break;
     case WM_KEYDOWN:
+        if (wp == VK_SPACE) {
+            running = true;
+        }
         if (wp == VK_LEFT) {
-            vel.x = -5;
+            if (vel.x >= -5)
+                vel.x = -5;
             flipped = false;
         }
         if (wp == VK_RIGHT) {
-            vel.x = 5;
+            if (vel.x <= 5)
+                vel.x = 5;
             flipped = true;
         }
         if (wp == VK_UP && grounded) {
@@ -187,14 +199,17 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
             grounded = false;
         }
         if (wp == VK_DOWN) {
-            vel.y = speed;
+
         }
         break;
     case WM_KEYUP:
-        if (wp == VK_LEFT) {
+        if (wp == VK_SPACE) {
+            running = false;
+        }
+        if (wp == VK_LEFT && vel.x >= -5) {
             vel.x = 0;
         }
-        if (wp == VK_RIGHT) {
+        if (wp == VK_RIGHT && vel.x <= 5) {
             vel.x = 0;
         }
         if (wp == VK_UP && vel.y < -20) {

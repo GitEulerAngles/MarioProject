@@ -21,11 +21,30 @@ void setup() {
 
     marioTexture = createSprite("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/marioTextures.png");
     blockTexture = createSprite("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/blockTextures.png");
+    backgroundTexture = createSprite("C:/Users/Kurt/source/repos/MarioProject1/MarioProject1/backgroundTextures.png");
 }
 void input() {
+    if (grounded) {
+        vel.x = floorf(vel.x * 10) / 10;
+        if (running) {
+            if (vel.x < 15 && vel.x > 0)
+                vel.x += 0.3;
+            else if (vel.x > -15 && vel.x < 0)
+                vel.x -= 0.3;
+        }
+        if (vel.x > 0)
+            vel.x -= 0.1;
+        else if (vel.x < 0)
+            vel.x += 0.1;
+    }
+
+    printf("%d\n", running);
+
     dynamicSprites[0].pos.x += vel.x;
     dynamicSprites[0].pos.y += vel.y;
     applyGravity(grounded, &vel);
+
+    physicsPos = dynamicBoxes[0];
 }
 void update() {
     grounded = false;
@@ -40,7 +59,7 @@ void update() {
 
     for (int16_t i = 0; i < 121; i++)
     if (getElement(&blockTypes, spritePosition(i)) != AIR) {
-        struct Vector2f collision = resolveCollision(dynamicBoxes[0], staticBoxes[i], false, &grounded);
+        struct Vector2f collision = resolveCollision(dynamicBoxes[0], staticBoxes[i], physicsPos, &grounded);
             
         if (collision.y > 0)
             grounded = true;
@@ -54,6 +73,7 @@ void update() {
     }
 
     updateCamera(dynamicSprites[0].pos);
+    updateBackground(cameraPos);
 }
 void render() {
     static int count, delay = 0;

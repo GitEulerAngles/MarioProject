@@ -224,11 +224,10 @@ LRESULT CALLBACK windowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     default:
         return DefWindowProcW(hWnd, msg, wp, lp);
     }
-
-    if (vel.y < 0)
-        animation.type = JUMPING;
-    else if (vel.y > 1)
+    if (vel.y > 40)
         animation.type = FALLING;
+    else if (!grounded)
+        animation.type = JUMPING;
     else if (vel.x == 0)
         animation.type = IDLE;
     else

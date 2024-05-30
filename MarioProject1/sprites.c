@@ -128,6 +128,8 @@ void updateBlocks() {
 void drawPlayer(struct playerAnimation * p) {
     if (p->type == IDLE)
         dynamicSprites[0].imageCoordinate.x = 0;
+    else if (p->type == JUMPING && abs(vel.x) > 13)
+        dynamicSprites[0].imageCoordinate.x = 96;
     else if (p->type == JUMPING)
         dynamicSprites[0].imageCoordinate.x = 32;
     else if (p->type == FALLING)
@@ -141,9 +143,17 @@ void drawPlayer(struct playerAnimation * p) {
             else
                 p->frame = 0;
         }
-        if (p->frame == 0)
-            dynamicSprites[0].imageCoordinate.x = 0;
-        if (p->frame == 1)
-            dynamicSprites[0].imageCoordinate.x = 16;
+        if (abs(vel.x) > 13) {
+            if (p->frame == 0)
+                dynamicSprites[0].imageCoordinate.x = 64;
+            if (p->frame == 1)
+                dynamicSprites[0].imageCoordinate.x = 80;
+        }
+        else {
+            if (p->frame == 0)
+                dynamicSprites[0].imageCoordinate.x = 0;
+            if (p->frame == 1)
+                dynamicSprites[0].imageCoordinate.x = 16;
+        }
     }
 }
